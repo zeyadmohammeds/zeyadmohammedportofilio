@@ -11,6 +11,10 @@ import {
 import { AppProvider, useApp } from "@/lib/mode-context";
 import { CommandPalette } from "@/components/command-palette";
 import { FloatingLogs } from "@/components/floating-logs";
+import { CustomCursor } from "@/components/custom-cursor";
+import { GridBackground } from "@/components/grid-background";
+import { BootSequence } from "@/components/boot-sequence";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { RobotAssistant } from "@/components/3d/robot-assistant";
 import { Toaster } from "sonner";
@@ -205,6 +209,9 @@ function InnerRoot() {
 
   return (
     <>
+      <BootSequence />
+      <GridBackground />
+      <CustomCursor />
       <div className="fixed left-0 top-0 z-[110] h-[3px] w-full bg-transparent">
         <div
           className="h-full bg-gradient-to-r from-primary via-accent to-info transition-[width] duration-150"
@@ -218,7 +225,18 @@ function InnerRoot() {
         <RobotAssistant />
       </ErrorBoundary>
       <Toaster theme={theme as "light" | "dark" | "system"} position="bottom-right" richColors closeButton />
-      <Outlet />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0, y: 15, filter: "blur(8px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, y: -15, filter: "blur(8px)" }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="flex min-h-screen flex-col"
+        >
+          <Outlet />
+        </motion.div>
+      </AnimatePresence>
     </>
   );
 }
